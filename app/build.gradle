@@ -5,12 +5,12 @@ plugins {
 
 android {
     namespace 'com.zybooks.diceroller'
-    compileSdk 32
+    compileSdk 30
 
     defaultConfig {
         applicationId "com.zybooks.diceroller"
         minSdk 21
-        targetSdk 32
+        targetSdk 30
         versionCode 1
         versionName "1.0"
 
@@ -30,6 +30,7 @@ android {
     kotlinOptions {
         jvmTarget = '1.8'
     }
+    buildFeatures { viewBinding true }
 }
 
 dependencies {

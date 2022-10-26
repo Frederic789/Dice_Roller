@@ -8,10 +8,14 @@ import android.view.View
 import android.widget.ImageView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
+import com.zybooks.diceroller.databinding.ActivityMainBinding
 
 const val MAX_DICE = 3
 
-class MainActivity : AppCompatActivity() {
+class MainActivity : AppCompatActivity(),
+    RollLengthDialogFragment.OnRollLengthSelectedListener{
+
+    private lateinit var binding: ActivityMainBinding
 
 
     private var timer: CountDownTimer? = null
@@ -24,7 +28,10 @@ class MainActivity : AppCompatActivity() {
     private var timerLength = 2000L
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+
+
+        setContentView(binding.root)
 
         // Create list of Dice
         diceList = mutableListOf()
@@ -34,7 +41,7 @@ class MainActivity : AppCompatActivity() {
 
         // Create list of ImageViews
         diceImageViewList = mutableListOf(
-            findViewById(R.id.dice1), findViewById(R.id.dice2), findViewById(R.id.dice3))
+            binding.dice1, binding.dice2, binding.dice3)
 
         showDice()
     }
@@ -55,7 +62,7 @@ class MainActivity : AppCompatActivity() {
         }
     }
 
-    override fun onRollLengthClick(which: Int) {
+     override fun onRollLengthClick(which: Int) {
         // Convert to milliseconds
         timerLength = 1000L * (which + 1)
     }
