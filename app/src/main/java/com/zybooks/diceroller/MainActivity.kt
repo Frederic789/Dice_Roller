@@ -4,16 +4,19 @@ import android.os.Bundle
 import android.os.CountDownTimer
 import android.view.Menu
 import android.view.MenuItem
-import android.view.View
+import android.view.MotionEvent
 import android.widget.ImageView
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.content.ContextCompat
 import com.zybooks.diceroller.databinding.ActivityMainBinding
+import java.lang.Math.abs
 
-const val MAX_DICE = 3
-
+const val MAX_DICE = 5
+private var initTouchY = 0
 class MainActivity : AppCompatActivity(),
     RollLengthDialogFragment.OnRollLengthSelectedListener{
+
 
     private lateinit var binding: ActivityMainBinding
 
@@ -26,6 +29,9 @@ class MainActivity : AppCompatActivity(),
     private lateinit var diceList: MutableList<Dice>
     private lateinit var diceImageViewList: MutableList<ImageView>
     private var timerLength = 2000L
+    private var total =0
+
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
@@ -39,12 +45,45 @@ class MainActivity : AppCompatActivity(),
             diceList.add(Dice(i + 1))
         }
 
+
+
         // Create list of ImageViews
         diceImageViewList = mutableListOf(
-            binding.dice1, binding.dice2, binding.dice3)
+            binding.dice1, binding.dice2, binding.dice3, binding.dice4, binding.dice5)
 
         showDice()
+
+        // create an dice up and down
+
+for ( i in 0  until  MAX_DICE){
+        diceImageViewList[i].setOnTouchListener { v, event ->
+            var returnVal = true
+            when (event.action) {
+                MotionEvent.ACTION_DOWN -> {
+                    initTouchY = event.y.toInt()
+                }
+                MotionEvent.ACTION_MOVE -> {
+                    val y = event.y.toInt()
+
+                    // See if movement is at least 20 pixels
+                    if (abs(y - initTouchY) >= 20) {
+                        if (y > initTouchY) {
+                            diceList[i].number++
+                        } else {
+                            diceList[i].number--
+                        }
+                        showDice()
+                        initTouchY = y
+                    }
+                }
+                else -> returnVal = false
+            }
+            returnVal
+        }
+
+}
     }
+
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
         menuInflater.inflate(R.menu.appbar_menu, menu)
@@ -72,17 +111,17 @@ class MainActivity : AppCompatActivity(),
         // Determine which menu option was chosen
         return when (item.itemId) {
             R.id.action_one -> {
-                changeDiceVisibility(1)
+                changeDiceVisibility()
                 showDice()
                 true
             }
             R.id.action_two -> {
-                changeDiceVisibility(2)
+                changeDiceVisibility()
                 showDice()
                 true
             }
             R.id.action_three -> {
-                changeDiceVisibility(3)
+                changeDiceVisibility()
                 showDice()
                 true
             }
@@ -105,7 +144,7 @@ class MainActivity : AppCompatActivity(),
         }
     }
 
-    private fun changeDiceVisibility(i: Int) {
+    private fun changeDiceVisibility() {
 
     }
 
@@ -118,8 +157,19 @@ class MainActivity : AppCompatActivity(),
             override fun onTick(millisUntilFinished: Long) {
                 for (i in 0 until numVisibleDice) {
                     diceList[i].roll()
+
+                    total += diceList[i].number
+
+
+
                 }
+                total++
+
+
+
                 showDice()
+                Toast.makeText(applicationContext, "total roll$total", Toast.LENGTH_LONG).show()
+
             }
 
             override fun onFinish() {
